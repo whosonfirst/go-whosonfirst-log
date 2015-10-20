@@ -38,10 +38,11 @@ You can pass regular old `fmt.Sprintf` formats and parameters to any of the logg
  
 ### Log levels
 
-The following log levels are supported, in this order. That means if you specify that the default log level is `warning` any messages logged to the `Info` or `Debug` methods will be ignored.
+The following log levels are supported, in this order. That means if you specify that the default log level is `warning` any messages logged to the `Status` or `Info` or `Debug` methods will be ignored.
 
 * debug
 * info
+* status
 * warning
 * error
 * fatal

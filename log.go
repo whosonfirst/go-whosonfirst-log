@@ -19,6 +19,7 @@ func NewWOFLogger(out io.Writer, prefix string, minlevel string) *WOFLogger {
 	levels["fatal"] = 0
 	levels["error"] = 10
 	levels["warning"] = 20
+	levels["status"] = 25
 	levels["info"] = 30
 	levels["debug"] = 40
 
@@ -34,6 +35,10 @@ func (l WOFLogger) Debug(format string, v ...interface{}) {
 
 func (l WOFLogger) Info(format string, v ...interface{}) {
 	l.format("info", format, v...)
+}
+
+func (l WOFLogger) Status(format string, v ...interface{}) {
+	l.format("status", format, v...)
 }
 
 func (l WOFLogger) Warning(format string, v ...interface{}) {
