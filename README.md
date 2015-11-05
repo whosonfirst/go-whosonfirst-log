@@ -48,3 +48,7 @@ The following log levels are supported, in this order. That means if you specify
 * fatal
 
 There are correspoding (public) instance methods available for each of these log levels. Invoking `logger.Fatal` will record the message to be logged and then call `os.Exit(1)`.
+
+## See also
+
+* http://dave.cheney.net/2015/11/05/lets-talk-about-logging
