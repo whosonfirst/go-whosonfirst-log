@@ -4,6 +4,8 @@ A simple Go package to implement level-dependent logging.
 
 ## Usage
 
+### Simple
+
 ```
 import (
        "io"
@@ -26,10 +28,38 @@ if verbose {
 	loglevel = "debug"
 }
 
-logger := log.NewWOFLogger(writer, "[your-app] ", loglevel)
+logger := log.NewWOFLogger("[your-app] ")
+logger.AddLogger(writer, loglevel)
 
 logger.Info("Writing all your logs to %s", logfile)
 logger.Debug("Hello world")
+```
+
+### Fancy
+
+
+```
+import (
+       "io"
+       "os"
+       "github.com/whosonfirst/go-whosonfirst-log"
+       "github.com/whosonfirst/go-slackcat-writer"
+)
+
+func main() {
+
+	writer := io.MultiWriter(os.Stdout)
+	slack, _ := slackcat.NewWriter("~/.slackcat.conf")
+
+	logger := log.NewWOFLogger("[your-app] ")
+
+	logger.AddLogger(writer, "debug")
+	logger.AddLogger(slack, "status")
+
+	logger.Info("Writing all your logs to %s", "wub wub wub")
+	logger.Debug("Hello world")
+	logger.Status("Hello Slack")
+}
 ```
 
 ### Messages
@@ -48,3 +78,7 @@ The following log levels are supported, in this order. That means if you specify
 * fatal
 
 There are correspoding (public) instance methods available for each of these log levels. Invoking `logger.Fatal` will record the message to be logged and then call `os.Exit(1)`.
+
+## See also
+
+* https://github.com/whosonfirst/go-slackcat-writer

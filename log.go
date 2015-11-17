@@ -1,6 +1,7 @@
 package log
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	golog "log"
@@ -8,14 +9,16 @@ import (
 )
 
 type WOFLogger struct {
-	Logger   *golog.Logger
-	MinLevel string
-	levels   map[string]int
+	Loggers map[string]*golog.Logger
+	levels  map[string]int
+	Prefix  string
 }
 
-func NewWOFLogger(out io.Writer, prefix string, minlevel string) *WOFLogger {
+func NewWOFLogger(prefix string) *WOFLogger {
 
+	loggers := make(map[string]*golog.Logger)
 	levels := make(map[string]int)
+
 	levels["fatal"] = 0
 	levels["error"] = 10
 	levels["warning"] = 20
@@ -23,48 +26,63 @@ func NewWOFLogger(out io.Writer, prefix string, minlevel string) *WOFLogger {
 	levels["info"] = 30
 	levels["debug"] = 40
 
-	logger := golog.New(out, prefix, golog.Lmicroseconds)
-
-	l := WOFLogger{Logger: logger, MinLevel: minlevel, levels: levels}
+	l := WOFLogger{Loggers: loggers, Prefix: prefix, levels: levels}
 	return &l
 }
 
+func (l WOFLogger) AddLogger(out io.Writer, minlevel string) (bool, error) {
+
+	_, ok := l.Loggers[minlevel]
+
+	if ok {
+		return false, errors.New("log level already defined")
+	}
+
+	logger := golog.New(out, l.Prefix, golog.Lmicroseconds)
+	l.Loggers[minlevel] = logger
+
+	return true, nil
+}
+
 func (l WOFLogger) Debug(format string, v ...interface{}) {
-	l.format("debug", format, v...)
+	l.dispatch("debug", format, v...)
 }
 
 func (l WOFLogger) Info(format string, v ...interface{}) {
-	l.format("info", format, v...)
+	l.dispatch("info", format, v...)
 }
 
 func (l WOFLogger) Status(format string, v ...interface{}) {
-	l.format("status", format, v...)
+	l.dispatch("status", format, v...)
 }
 
 func (l WOFLogger) Warning(format string, v ...interface{}) {
-	l.format("warning", format, v...)
+	l.dispatch("warning", format, v...)
 }
 
 func (l WOFLogger) Error(format string, v ...interface{}) {
-	l.format("error", format, v...)
+	l.dispatch("error", format, v...)
 }
 
 func (l WOFLogger) Fatal(format string, v ...interface{}) {
-	l.format("fatal", format, v...)
+	l.dispatch("fatal", format, v...)
 	os.Exit(1)
 }
 
-func (l WOFLogger) format(level string, format string, v ...interface{}) {
+func (l WOFLogger) dispatch(level string, format string, v ...interface{}) {
 
-	if l.emit(level) {
+	for minlevel, logger := range l.Loggers {
 
-		msg := fmt.Sprintf(format, v...)
-		out := fmt.Sprintf("[%s] %s", level, msg)
-		l.Logger.Println(out)
+		if l.emit(level, minlevel) {
+
+			msg := fmt.Sprintf(format, v...)
+			out := fmt.Sprintf("[%s] %s", level, msg)
+			logger.Println(out)
+		}
 	}
 }
 
-func (l WOFLogger) emit(level string) bool {
+func (l WOFLogger) emit(level string, minlevel string) bool {
 
 	this_level, ok := l.levels[level]
 
@@ -72,7 +90,7 @@ func (l WOFLogger) emit(level string) bool {
 		return false
 	}
 
-	min_level, ok := l.levels[l.MinLevel]
+	min_level, ok := l.levels[minlevel]
 
 	if !ok {
 		return false
