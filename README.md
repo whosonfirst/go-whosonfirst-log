@@ -81,4 +81,5 @@ There are correspoding (public) instance methods available for each of these log
 
 ## See also
 
+* http://dave.cheney.net/2015/11/05/lets-talk-about-logging
 * https://github.com/whosonfirst/go-slackcat-writer
