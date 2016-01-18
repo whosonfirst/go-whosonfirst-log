@@ -45,4 +45,8 @@ func main() {
 	woo(mock)
 
 	fmt.Println("DONE")
+
+	l := log.SimpleWOFLogger("foo")
+	l.Status("FOO")
+	l.Info("Info")
 }
