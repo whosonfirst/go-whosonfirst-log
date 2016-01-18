@@ -8,6 +8,24 @@ import (
 	"os"
 )
 
+type WOFLog interface {
+	Fatal(format string, v ...interface{})
+	Error(format string, v ...interface{})
+	Warning(format string, v ...interface{})
+	Status(format string, v ...interface{})
+	Info(format string, v ...interface{})
+	Debug(format string, v ...interface{})
+}
+
+type MockLogger struct{}
+
+func (m *MockLogger) Fatal(format string, v ...interface{})   {}
+func (m *MockLogger) Error(format string, v ...interface{})   {}
+func (m *MockLogger) Warning(format string, v ...interface{}) {}
+func (m *MockLogger) Status(format string, v ...interface{})  {}
+func (m *MockLogger) Info(format string, v ...interface{})    {}
+func (m *MockLogger) Debug(format string, v ...interface{})   {}
+
 type WOFLogger struct {
 	Loggers map[string]*golog.Logger
 	levels  map[string]int

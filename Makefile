@@ -12,7 +12,7 @@ fmt:
 	go fmt *.go
 
 test:	self fmt
-	go build -o bin/test cmd/test.go
+	@GOPATH=$(shell pwd) go build -o bin/test cmd/test.go
 
 bin: 	test
 
