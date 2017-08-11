@@ -7,7 +7,7 @@ import (
 	golog "log"
 	"os"
 	"path/filepath"
-	"strings"
+	_ "strings"
 )
 
 type WOFLog interface {
@@ -37,20 +37,20 @@ type WOFLogger struct {
 func Prefix(args ...string) string {
 
 	whoami := os.Args[0]
-	prefix := filepath.Base(whoami)
+	whoami = filepath.Base(whoami)
 
-	if len(args) > 0 {
-		prefix = args[0]
+	prefix := fmt.Sprintf("[%s]", whoami)
+
+	for _, s := range args {
+		prefix = fmt.Sprintf("%s[%s]", prefix, s)
 	}
 
-	return fmt.Sprintf("[%s] ", prefix)
+	return prefix
 }
 
 func SimpleWOFLogger(args ...string) *WOFLogger {
 
-	prefix := Prefix(args...)
-
-	logger := NewWOFLogger(prefix)
+	logger := NewWOFLogger(args...)
 
 	stdout := io.Writer(os.Stdout)
 	stderr := io.Writer(os.Stderr)
@@ -75,7 +75,12 @@ func NewWOFLogger(args ...string) *WOFLogger {
 	levels["info"] = 30
 	levels["debug"] = 40
 
-	l := WOFLogger{Loggers: loggers, Prefix: prefix, levels: levels}
+	l := WOFLogger{
+		Loggers: loggers,
+		Prefix:  prefix,
+		levels:  levels,
+	}
+
 	return &l
 }
 
@@ -87,13 +92,7 @@ func (l WOFLogger) AddLogger(out io.Writer, minlevel string) (bool, error) {
 		return false, errors.New("log level already defined")
 	}
 
-	prefix := l.Prefix
-
-	if !strings.HasSuffix(prefix, " ") {
-		prefix += " "
-	}
-
-	logger := golog.New(out, prefix, golog.Lmicroseconds)
+	logger := golog.New(out, "", golog.Lmicroseconds)
 	l.Loggers[minlevel] = logger
 
 	return true, nil
@@ -131,7 +130,8 @@ func (l WOFLogger) dispatch(level string, format string, v ...interface{}) {
 		if l.emit(level, minlevel) {
 
 			msg := fmt.Sprintf(format, v...)
-			out := fmt.Sprintf("[%s] %s", level, msg)
+
+			out := fmt.Sprintf("%s[%s] %s", l.Prefix, level, msg)
 			logger.Println(out)
 		}
 	}
