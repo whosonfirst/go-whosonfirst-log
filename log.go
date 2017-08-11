@@ -7,7 +7,7 @@ import (
 	golog "log"
 	"os"
 	"path/filepath"
-	_ "strings"
+	"strings"
 )
 
 type WOFLog interface {
@@ -131,7 +131,7 @@ func (l WOFLogger) dispatch(level string, format string, v ...interface{}) {
 
 			msg := fmt.Sprintf(format, v...)
 
-			out := fmt.Sprintf("%s[%s] %s", l.Prefix, level, msg)
+			out := fmt.Sprintf("%s[%s] %s", l.Prefix, strings.ToUpper(level), msg)
 			logger.Println(out)
 		}
 	}
