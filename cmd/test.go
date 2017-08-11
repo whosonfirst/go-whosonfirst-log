@@ -17,7 +17,7 @@ func main() {
 
 	writer := io.MultiWriter(os.Stdout)
 
-	logger := log.NewWOFLogger("[your-app] ")
+	logger := log.NewWOFLogger()
 	logger.AddLogger(writer, "debug")
 
 	/*

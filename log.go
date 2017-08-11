@@ -6,6 +6,7 @@ import (
 	"io"
 	golog "log"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -33,7 +34,21 @@ type WOFLogger struct {
 	Prefix  string
 }
 
-func SimpleWOFLogger(prefix string) *WOFLogger {
+func Prefix(args ...string) string {
+
+	whoami := os.Args[0]
+	prefix := filepath.Base(whoami)
+
+	if len(args) > 0 {
+		prefix = args[0]
+	}
+
+	return fmt.Sprintf("[%s] ", prefix)
+}
+
+func SimpleWOFLogger(args ...string) *WOFLogger {
+
+	prefix := Prefix(args...)
 
 	logger := NewWOFLogger(prefix)
 
@@ -46,7 +61,9 @@ func SimpleWOFLogger(prefix string) *WOFLogger {
 	return logger
 }
 
-func NewWOFLogger(prefix string) *WOFLogger {
+func NewWOFLogger(args ...string) *WOFLogger {
+
+	prefix := Prefix(args...)
 
 	loggers := make(map[string]*golog.Logger)
 	levels := make(map[string]int)
