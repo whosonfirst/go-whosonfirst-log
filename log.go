@@ -91,6 +91,9 @@ func (l WOFLogger) AddLogger(out io.Writer, minlevel string) (bool, error) {
 	// PLEASE FIX THIS...
 	// https://github.com/whosonfirst/go-whosonfirst-log/issues/2
 	
+	// writer = io.MultiWriter(os.Stdout)
+
+
 	if ok {
 		return false, errors.New("log level already defined")
 	}
